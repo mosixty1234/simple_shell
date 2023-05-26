@@ -1,64 +1,115 @@
 #ifndef SHELL_H
 #define SHELL_H
-#include <stdarg.h>
+#define OUT 0
+#define IN 1
+
+/* --External Variables-- */
+extern char **environ;
+int innchld;
+
+/* --Library Headers-- */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
-#include <errno.h>
+#include <string.h>
 #include <signal.h>
-#include <sys/signal.h>
-#include <dirent.h>
-#include <sys/stat.h>
+#include <fcntl.h>
 
+/* --Address List-- */
 /**
- * struct perFmt - percentage formats structure
- * @t: percentage format
- * @f: func
+ * struct addresses - Structure of node which holds list of all addresses
+ * @address: storage of address
+ * @next: Pointer to the following node in list
  */
-typedef struct perFmt
+typedef struct addresses
 {
-	char t;
-	void (*f)(va_list, int *);
-} perF;
+	void *address;
+	struct addresses *next;
+} addr_t;
 
+/* --Builtin Struct--*/
 /**
- *struct bullIn - built-in function structure
- *@s: string to be evaluated
- *@fun: function correspond to the string
+ * struct builtins_s - Structure for built-in names & pointers to functions
+ * @name: Name of built-in
+ * @fanct: Pointer to function to call if the name is inputtted
  */
-typedef struct bullIn
+typedef struct builtins_s
 {
-	char *s;
-	int (*fun)(char **);
-} perfBu;
+	char *name;
+	int (*fanct)();
+} builtins_p;
 
-typedef void (*sighandler_t)(int);
-char *getString(int *i);
-char **tokenArg(char *_str);
-int execFunc(int *pressed, char **_args, char **av, char **env);
-int handleBuiltin(char **_args, char **env);
-int handleExec(int *pressed, char **_args, char **av, char **env);
-void *_realloc(void *ptr, int oldSize, int newSize);
-int cdFunc(char **);
-int pwdFunc(char **);
-int exitFunc(char **);
-int enviFunc(char **);
-char *envFunc(char *_com, char **env, int *no_path);
-char *_stringDup(char *str);
-char *stringConcat(char *s1, char *s2);
-int *_putchar(char c, int *p);
-int _printf(const char *format, ...);
-void printCharacter(va_list va, int *p);
-void printString(va_list va, int *p);
-void printInteger(va_list va, int *p);
-int countFunc(char *s);
-void printDecimal(va_list va, int *p);
-int fmtFunc(const char *format, int i, va_list toPrint, int *pun);
-int printNum(int n, int *p);
-int _stringCmp(char *s1, char *s2);
-int funcStat(char **_str, int *_fl, char *_com, int c, char *av_0, char **env);
+/* --Help Struct --*/
+/**
+ * struct help_s - Structure for different info of built_ins
+ * @name: specific built-in to get help from
+ * @fanct: Pointer to function to call if the name is inputtted
+ */
+typedef struct help_s
+{
+	char *name;
+	void (*fanct)();
+} help_p;
 
-#endif
+/* --General Functions-- */
+int wedcount(char *stri);
+void loop(void);
+char **mek_arrgz(char *inputt);
+void output(char **arrgz);
+char *tokenaiz(char *inputt, const char *delimie, char **servepotr);
+void execute(char **arrgz);
+int chek_argzz(char *fst_arg, char *arg0);
+void siglhndler(int unsd_var);
+
+/* --Memory Functions-- */
+void *space_alloc(size_t size);
+void array_free(char **array);
+
+/* --Builtin Functions-- */
+int star_printenv(char **arrgz);
+int check_built_ins(char **arrgz, char *inputt);
+int star_set_envir(char **arrgz);
+int star_help(char **arrgz);
+int star_exit(char **arrgz, char *inputt);
+int star_unsatenviro(char **arrgz);
+
+/* --Path Functions-- */
+char **check_path(char **arrgz);
+char *path_cnkat(char *st1, char *st2);
+char *_kpypth(char *name);
+
+/* --Env Functions-- */
+int _unsatenviro(char *name);
+char *_findenv(char *name);
+int _addenv(char *newvar, char *name);
+
+/* --Print Functions-- */
+void _puts(char *stri);
+int _putchar(char c);
+
+/* --Help Functions-- */
+void hellp_exit(void);
+void hellp_env(void);
+void helpp_set_envir(void);
+void hellpp_unsatenviro(void);
+void helped_help(void);
+void print_helped(void);
+
+/* --String Functions-- */
+char *_stridpl(char *stri);
+int _strilng(char *s);
+char *_strchar(char *s, char c);
+char *_strocbt(char *s, const char *admitt);
+int _stsbpr(char *s, const char *admitt);
+int _stricpr(char *st1, char *st2, int n);
+char *_stri_cncat(char *st1, char *st2);
+char *_strikpy(char *dst, char *src);
+
+/* --Math Functions-- */
+int _asti(char *stri);
+
+#endif /* SHELL_H */
+
